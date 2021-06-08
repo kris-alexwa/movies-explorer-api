@@ -8,7 +8,11 @@ function createUser(req, res, next) {
   const { name, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => User.create({ name, email, password: hash }))
-    .then((user) => res.send(user))
+    .then((user) => res.send({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
         throw new ConflictError('Пользователь с таким email уже существует');
@@ -54,7 +58,9 @@ function updateUserInfo(req, res, next) {
       res.send(user);
     })
     .catch((err) => {
-      console.log(err);
+      if (err.name === 'MongoError' && err.code === 11000) {
+        throw new ConflictError('Пользователь с таким email уже существует');
+      }
       if (err.name === 'ValidationError') {
         throw new ValidationError(`Переданы некорректные данные ${err.message}`);
       }

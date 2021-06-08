@@ -11,9 +11,9 @@ function createMovie(req, res, next) {
   const {
     country, director, duration, year,
     description, image, trailer, thumbnail,
-    nameRU, nameEN,
+    nameRU, nameEN, movieId,
   } = req.body;
-  console.log();
+
   Movie.create({
     country,
     director,
@@ -25,9 +25,10 @@ function createMovie(req, res, next) {
     thumbnail,
     nameRU,
     nameEN,
+    movieId,
     owner: req.user._id,
   })
-    .then((newMovie) => res.send({ ...newMovie.toObject(), movieId: newMovie._id }))
+    .then((newMovie) => res.send(newMovie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new ValidationError(`Переданы некорректные данные ${err.message}`);
@@ -38,20 +39,21 @@ function createMovie(req, res, next) {
 }
 
 function deleteMovie(req, res, next) {
-  Movie.findById(req.params.movieId)
+  const { id } = req.params;
+  Movie.findById(id)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError(`Фильм с указанным id ${req.params.movieId} не найден`);
+        throw new NotFoundError(`Фильм с указанным id ${id} не найден`);
       }
       if (req.user._id !== movie.owner.toString()) {
         throw new ForbiddenError('Нельзя удалить чужой фильм');
       }
     })
-    .then(() => Movie.findByIdAndRemove(req.params.movieId))
+    .then(() => Movie.findByIdAndRemove(id))
     .then(() => res.send({ message: 'Фильм удален' }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new ValidationError(`Перадан некорректный id ${req.params.cardId}`);
+        throw new ValidationError(`Перадан некорректный id ${id}`);
       }
       throw err;
     })

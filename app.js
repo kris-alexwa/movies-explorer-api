@@ -1,12 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const { celebrate, Joi, errors } = require('celebrate');
-const routerUsers = require('./routes/users');
-const routerMovies = require('./routes/movies');
-const login = require('./controllers/login');
-const auth = require('./middlewares/auth');
-const { createUser } = require('./controllers/users');
+const { errors } = require('celebrate');
+const routes = require('./routes/index');
 const { NotFoundError, ErrorWithStatusCode } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 require('dotenv').config();
@@ -32,17 +28,7 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 
 app.use(requestLogger);
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
-app.post('/signup', createUser);
-
-app.use('/movies', auth, routerMovies);
-app.use('/users', auth, routerUsers);
+app.use(routes);
 
 app.use(errorLogger);
 
