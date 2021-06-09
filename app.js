@@ -35,10 +35,7 @@ app.use(errorLogger);
 app.use(errors());
 
 app.use((req, res, next) => {
-  if (!req.route) {
     return next(new NotFoundError('Страница не найдена'));
-  }
-  return next();
 });
 
 app.use((err, req, res, next) => {

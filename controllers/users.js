@@ -26,11 +26,7 @@ function createUser(req, res, next) {
 }
 
 function returnUserInfo(req, res, next) {
-  const myId = req.user?._id;
-  if (!myId) {
-    throw new UnauthorizedError('Пользователь не залогинен');
-  }
-  User.findById(myId)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(`Пользователь с указанным id ${req.params.id} не найден`);

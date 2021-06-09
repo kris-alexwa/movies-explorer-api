@@ -3,7 +3,6 @@
     "browser": true,
     "es2021": true
   },
-  "extends": "airbnb-base",
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -14,11 +13,6 @@
   "rules": {
     "no-underscore-dangle": [
       "off"
-    ],
-    "no-unused-vars": ["off"],
-    "max-classes-per-file": ["off"],
-    "indent": ["off"],
-    "no-console": ["off"],
-    "func-names": ["off"],
+    ]
   }
 }
