@@ -1,14 +1,21 @@
 const express = require('express');
+const helmet = require('helmet');
+const limiter = require('./limiter');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const routes = require('./routes/index');
 const { NotFoundError, ErrorWithStatusCode } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { MONGO_URL } = require('./config');
 require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
 const app = express();
+
+app.use(requestLogger);
+app.use(helmet());
+app.use(limiter);
 
 app.use(express.json());
 
@@ -19,14 +26,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
 }));
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-
-app.use(requestLogger);
 
 app.use(routes);
 
@@ -35,7 +40,7 @@ app.use(errorLogger);
 app.use(errors());
 
 app.use((req, res, next) => {
-    return next(new NotFoundError('Страница не найдена'));
+  return next(new NotFoundError('Страница не найдена'));
 });
 
 app.use((err, req, res, next) => {
