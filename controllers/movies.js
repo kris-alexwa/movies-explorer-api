@@ -1,5 +1,5 @@
 const Movie = require('../models/movie');
-const { NotFoundError, ValidationError, ForbiddenError } = require('../errors/errors');
+const { NotFoundError, ValidationError, ForbiddenError, ConflictError } = require('../errors/errors');
 
 function returnMovies(req, res, next) {
   Movie.findMoviesByOwner(req.user._id)
@@ -14,28 +14,59 @@ function createMovie(req, res, next) {
     nameRU, nameEN, movieId,
   } = req.body;
 
-  Movie.create({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailer,
-    thumbnail,
-    nameRU,
-    nameEN,
-    movieId,
-    owner: req.user._id,
-  })
-    .then((newMovie) => res.send(newMovie))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new ValidationError(`Переданы некорректные данные ${err.message}`);
+  Movie.findMoviesByOwner(req.user._id)
+    .then((movies) => {
+      if (movies.some((movie) => movie.movieId === movieId)) {
+        throw new ConflictError('Данный фильм уже был добавлен в избранное');
       }
-      throw err;
+    })
+    .then(() => {
+      Movie.create({
+        country,
+        director,
+        duration,
+        year,
+        description,
+        image,
+        trailer,
+        thumbnail,
+        nameRU,
+        nameEN,
+        movieId,
+        owner: req.user._id,
+      })
+        .then((newMovie) => res.send(newMovie))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            throw new ValidationError(`Переданы некорректные данные ${err.message}`);
+          }
+          throw err;
+        })
     })
     .catch((err) => next(err));
+
+  // Movie.create({
+  //   country,
+  //   director,
+  //   duration,
+  //   year,
+  //   description,
+  //   image,
+  //   trailer,
+  //   thumbnail,
+  //   nameRU,
+  //   nameEN,
+  //   movieId,
+  //   owner: req.user._id,
+  // })
+  //   .then((newMovie) => res.send(newMovie))
+  //   .catch((err) => {
+  //     if (err.name === 'ValidationError') {
+  //       throw new ValidationError(`Переданы некорректные данные ${err.message}`);
+  //     }
+  //     throw err;
+  //   })
+  //   .catch((err) => next(err));
 }
 
 function deleteMovie(req, res, next) {
