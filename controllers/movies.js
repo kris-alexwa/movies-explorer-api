@@ -44,29 +44,6 @@ function createMovie(req, res, next) {
         })
     })
     .catch((err) => next(err));
-
-  // Movie.create({
-  //   country,
-  //   director,
-  //   duration,
-  //   year,
-  //   description,
-  //   image,
-  //   trailer,
-  //   thumbnail,
-  //   nameRU,
-  //   nameEN,
-  //   movieId,
-  //   owner: req.user._id,
-  // })
-  //   .then((newMovie) => res.send(newMovie))
-  //   .catch((err) => {
-  //     if (err.name === 'ValidationError') {
-  //       throw new ValidationError(`Переданы некорректные данные ${err.message}`);
-  //     }
-  //     throw err;
-  //   })
-  //   .catch((err) => next(err));
 }
 
 function deleteMovie(req, res, next) {
