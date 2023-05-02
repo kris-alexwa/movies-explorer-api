@@ -21,6 +21,4 @@ npm run dev
 ```
 Если вы все сделали правильно, то сервер запустится, а в терминале появится сообщение "App listening on port 3000".
 
-Сайт всегда доступен по адресу: https://movie-kris.nomoredomains.club/movies;
-
 Бэкенд приложения: https://api.movie-kris.nomoredomains.club/ 
